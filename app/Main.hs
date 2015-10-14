@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import qualified Santa
 
 main :: IO ()
-main = someFunc
+main = Santa.go
