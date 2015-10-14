@@ -110,6 +110,6 @@ go = do
   pmon <- newMVar ()
   elf_group <- newGroup 3
   sequence_ [elf elf_group n pmon | n <- [1..10]]
-  deer_group <- newGroup 7
+  deer_group <- newGroup 9
   sequence_ [reindeer deer_group n pmon | n <- [1..9]]
   forever (santa elf_group deer_group pmon)
