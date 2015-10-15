@@ -82,13 +82,13 @@ randomDelay = do
 
 elf :: Group -> Int -> MVar () -> IO ThreadId
 elf gp id mon = forkIO $ forever $ do
-  elf1 gp id mon
   randomDelay
+  elf1 gp id mon
 
 reindeer :: Group -> Int -> MVar () -> IO ThreadId
 reindeer gp id mon = forkIO $ forever $ do
-  reindeer1 gp id mon
   randomDelay
+  reindeer1 gp id mon
 
 santa :: Group -> Group -> MVar () -> IO ()
 santa elf_gp deer_gp mon = do
