@@ -1,6 +1,4 @@
 module Main where
 
-import qualified Santa
-
 main :: IO ()
-main = Santa.go
+main = putStrLn "in GHCI you can runSanta or runBeer"
