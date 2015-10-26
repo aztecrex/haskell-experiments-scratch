@@ -105,8 +105,8 @@ santa elf_gp deer_gp mon = do
       gates <- awaitGroup gp
       return (task, gates)
 
-go :: IO ()
-go = do
+runSanta :: IO ()
+runSanta = do
   pmon <- newMVar ()
   elf_group <- newGroup 3
   sequence_ [elf elf_group n pmon | n <- [1..10]]
