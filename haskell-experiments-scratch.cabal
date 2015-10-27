@@ -22,6 +22,9 @@ library
                      , random
                      , text
                      , split
+                     , bytestring
+                     , base64-bytestring
+                     , base16-bytestring
   default-language:    Haskell2010
 
 executable haskell-experiments-scratch-exe
