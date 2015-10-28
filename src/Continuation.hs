@@ -38,3 +38,44 @@ ex2 = print $ runCont callcc show
 
 ex3 :: IO ()
 ex3 = runContT contt print
+
+ex4 :: IO ()
+ex4 = flip runContT return $ do
+  lift $ putStrLn "alpha"
+  callCC $ \k -> do
+    lift $ putStrLn "insert"
+    k ()
+  lift $ putStrLn "beta"
+  lift $ putStrLn "gamma"
+
+ex5 :: IO ()
+ex5 = flip runContT return $ do
+  lift $ putStrLn "alpha"
+  callCC $ \k -> do
+    k ()
+    lift $ putStrLn "insert"
+  lift $ putStrLn "beta"
+  lift $ putStrLn "gamma"
+
+ex6 :: IO ()
+ex6 = flip runContT return $ do
+  lift $ putStrLn "alpha"
+  num <- callCC $ \k -> do
+    if 42 == 7 * 6
+      then k 42
+      else lift $ putStrLn "uh oh"
+    return 43
+  lift $ putStrLn "beta"
+  lift $ putStrLn "gamma"
+  lift $ print num
+
+ex7 :: IO ()
+ex7 = flip runContT return $ do
+  lift $ putStrLn "alpha"
+  (k, num) <- callCC $ \k -> let f x = k (f, x)
+                             in return (f, 0)
+  lift $ putStrLn "beta"
+  lift $ putStrLn "gamma"
+  if num < 5
+    then (lift $ print num) >> k (num + 1) >> return ()
+    else lift $ print num
