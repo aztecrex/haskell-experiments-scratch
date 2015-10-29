@@ -28,6 +28,7 @@ library
                      , base64-bytestring
                      , base16-bytestring
                      , mtl
+                     , conduit
   default-language:    Haskell2010
 
 executable haskell-experiments-scratch-exe
