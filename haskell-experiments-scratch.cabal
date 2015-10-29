@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Santa
                      , StringThing
+                     , Continuation
   build-depends:       base >= 4.7 && < 5
                      , stm
                      , random
@@ -25,6 +26,7 @@ library
                      , bytestring
                      , base64-bytestring
                      , base16-bytestring
+                     , mtl
   default-language:    Haskell2010
 
 executable haskell-experiments-scratch-exe
