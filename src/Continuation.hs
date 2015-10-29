@@ -79,3 +79,10 @@ ex7 = flip runContT return $ do
   if num < 5
     then (lift $ print num) >> k (num + 1) >> return ()
     else lift $ print num
+
+aGoto :: IO ()
+aGoto = flip runContT return $ do
+  label <- callCC $ \k -> let f _ = k f
+                          in return f
+  lift $ putStrLn "hello"
+  label ()
