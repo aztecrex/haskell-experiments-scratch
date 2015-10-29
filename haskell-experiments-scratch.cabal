@@ -18,6 +18,7 @@ library
   exposed-modules:     Santa
                      , StringThing
                      , Continuation
+                     , Conduit
   build-depends:       base >= 4.7 && < 5
                      , stm
                      , random
