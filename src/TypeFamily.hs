@@ -1,31 +1,48 @@
 {-#LANGUAGE MultiParamTypeClasses #-}
+{-#LANGUAGE TypeFamilies, FlexibleContexts #-}
 
 module TypeFamily where
 
 import Data.Tuple
 
+
+
+class (Show a, Show (Move a)) => Pokemon a where
+  data Move a :: *
+  pickMove :: a -> Move a
+
 data Fire = Charmander | Charmeleon | Charizard deriving Show
-data Water = Squirtle | Wartortle | Blastoise deriving Show
-data Grass = Bulbasaur | Ivysaur | Venusaur deriving Show
-
-data FireMove = Ember | FlameThrower | FireBlast deriving Show
-data WaterMove = Bubble | WaterGun deriving Show
-data GrassMove = VineWhip deriving Show
-
-class (Show creature, Show move) => Pokemon creature  move where
-  pickMove :: creature -> move
-
-instance Pokemon Fire FireMove where
+instance Pokemon Fire where
+  data Move Fire = Ember | FlameThrower | FireBlast deriving Show
   pickMove Charmander = Ember
   pickMove Charmeleon = FlameThrower
-  pickMove Charizard = FireBlast
+  pickMove Charizard= FireBlast
 
-instance Pokemon Water WaterMove where
+data Water = Squirtle | Wartortle | Blastoise deriving Show
+instance Pokemon Water where
+  data Move Water = Bubble | WaterGun deriving Show
   pickMove Squirtle = Bubble
   pickMove _ = WaterGun
 
-instance Pokemon Grass GrassMove where
+data Grass = Bulbasaur | Ivysaur | Venusaur deriving Show
+instance Pokemon Grass where
+  data Move Grass = VineWhip deriving Show
   pickMove _ = VineWhip
+
+pickMoveEx :: IO ()
+pickMoveEx = do
+  print $ pickMove Squirtle
+  print $ pickMove Charmander
+  print $ pickMove Ivysaur
+
+class (Pokemon winner, Pokemon loser) => Battle winner loser where
+  battle :: winner -> loser -> IO ()
+  battle w l = do
+      printBattle (show w) (show wmove) (show l) (show lmove) (show w)
+    where
+      wmove = pickMove w
+      lmove = pickMove l
+
 
 printBattle :: String -> String -> String -> String -> String -> IO ()
 printBattle pk1 mv1 pk2 mv2 winner = do
@@ -34,34 +51,25 @@ printBattle pk1 mv1 pk2 mv2 winner = do
   putStrLn $ "Winner is: " ++ winner
   putStrLn ""
 
-class (Pokemon creature1 move1, Pokemon creature2 move2) => Battle creature1 move1 creature2 move2 where
-    battle :: creature1 -> creature2 -> IO (move1, move2)
-    battle c1 c2 = do
-        printBattle (show c1) (show m1) (show c2) (show m2) (show c1)
-        return (m1,m2)
-      where
-        m1 = pickMove c1
-        m2 = pickMove c2
 
-instance Battle Water WaterMove Fire FireMove
-instance Battle Fire FireMove Water WaterMove where
-  battle a b = fmap swap $ flip battle a b
+instance Battle Water Fire
+instance Battle Fire Water where
+  battle = flip battle
 
-instance Battle Grass GrassMove Water WaterMove
-instance Battle Water WaterMove Grass GrassMove where
-  battle a b = fmap swap $ flip battle a b
+instance Battle Grass Water
+instance Battle Water Grass where
+  battle = flip battle
 
-instance Battle Fire FireMove Grass GrassMove
-instance Battle Grass GrassMove Fire FireMove where
-  battle a b = fmap swap $ flip battle a b
+instance Battle Fire Grass
+instance Battle Grass Fire where
+  battle = flip battle
 
 
 battleEx1 :: IO ()
 battleEx1 = do
-  battle Squirtle Charmander :: IO (WaterMove, FireMove)
-  battle Charmeleon Wartortle :: IO (FireMove, WaterMove)
-  battle Bulbasaur Blastoise :: IO (GrassMove, WaterMove)
-  battle Wartortle Ivysaur :: IO (WaterMove, GrassMove)
-  battle Charmeleon Ivysaur :: IO (FireMove, GrassMove)
-  battle Venusaur Charizard :: IO (GrassMove, FireMove)
-  putStrLn "Done Fighting"
+  battle Squirtle Charmander
+  battle Charmeleon Wartortle
+  battle Bulbasaur Blastoise
+  battle Wartortle Ivysaur
+  battle Charmeleon Ivysaur
+  battle Venusaur Charizard
