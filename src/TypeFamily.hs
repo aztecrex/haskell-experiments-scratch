@@ -2,6 +2,8 @@
 
 module TypeFamily where
 
+import Data.Tuple
+
 data Fire = Charmander | Charmeleon | Charizard deriving Show
 data Water = Squirtle | Wartortle | Blastoise deriving Show
 data Grass = Bulbasaur | Ivysaur | Venusaur deriving Show
@@ -10,8 +12,8 @@ data FireMove = Ember | FlameThrower | FireBlast deriving Show
 data WaterMove = Bubble | WaterGun deriving Show
 data GrassMove = VineWhip deriving Show
 
-class (Show nature, Show move) => Pokemon nature  move where
-  pickMove :: nature -> move
+class (Show creature, Show move) => Pokemon creature  move where
+  pickMove :: creature -> move
 
 instance Pokemon Fire FireMove where
   pickMove Charmander = Ember
@@ -32,38 +34,34 @@ printBattle pk1 mv1 pk2 mv2 winner = do
   putStrLn $ "Winner is: " ++ winner
   putStrLn ""
 
-battleWaterVsFire :: Water -> Fire -> IO ()
-battleWaterVsFire water fire = do
-  printBattle (show water) (show wmove) (show fire) (show fmove) (show water)
-  where
-    wmove = pickMove water :: WaterMove
-    fmove = pickMove fire :: FireMove
+class (Pokemon creature1 move1, Pokemon creature2 move2) => Battle creature1 move1 creature2 move2 where
+    battle :: creature1 -> creature2 -> IO (move1, move2)
+    battle c1 c2 = do
+        printBattle (show c1) (show m1) (show c2) (show m2) (show c1)
+        return (m1,m2)
+      where
+        m1 = pickMove c1
+        m2 = pickMove c2
 
-battleFireVsWater = flip battleWaterVsFire
+instance Battle Water WaterMove Fire FireMove
+instance Battle Fire FireMove Water WaterMove where
+  battle a b = fmap swap $ flip battle a b
 
-battleGrassVsWater :: Grass -> Water -> IO ()
-battleGrassVsWater grass water = do
-  printBattle (show grass) (show gmove) (show water) (show wmove) (show grass)
-  where
-    gmove = pickMove grass :: GrassMove
-    wmove = pickMove water :: WaterMove
+instance Battle Grass GrassMove Water WaterMove
+instance Battle Water WaterMove Grass GrassMove where
+  battle a b = fmap swap $ flip battle a b
 
-battleWaterVsGrass = flip battleGrassVsWater
+instance Battle Fire FireMove Grass GrassMove
+instance Battle Grass GrassMove Fire FireMove where
+  battle a b = fmap swap $ flip battle a b
 
-battleFireVsGrass :: Fire -> Grass -> IO ()
-battleFireVsGrass fire grass = do
-  printBattle (show fire) (show fmove) (show grass) (show gmove) (show fire)
-  where
-    fmove = pickMove fire :: FireMove
-    gmove = pickMove grass :: GrassMove
-
-battleGrassVsFire = flip battleFireVsGrass
 
 battleEx1 :: IO ()
 battleEx1 = do
-  battleWaterVsFire Squirtle Charmander
-  battleFireVsWater Charmeleon Wartortle
-  battleGrassVsWater Bulbasaur Blastoise
-  battleWaterVsGrass Wartortle Ivysaur
-  battleFireVsGrass Charmeleon Ivysaur
-  battleGrassVsFire Venusaur Charizard
+  battle Squirtle Charmander :: IO (WaterMove, FireMove)
+  battle Charmeleon Wartortle :: IO (FireMove, WaterMove)
+  battle Bulbasaur Blastoise :: IO (GrassMove, WaterMove)
+  battle Wartortle Ivysaur :: IO (WaterMove, GrassMove)
+  battle Charmeleon Ivysaur :: IO (FireMove, GrassMove)
+  battle Venusaur Charizard :: IO (GrassMove, FireMove)
+  putStrLn "Done Fighting"
