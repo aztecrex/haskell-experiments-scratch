@@ -1,3 +1,5 @@
+{-#LANGUAGE MultiParamTypeClasses #-}
+
 module TypeFamily where
 
 data Fire = Charmander | Charmeleon | Charizard deriving Show
@@ -8,17 +10,20 @@ data FireMove = Ember | FlameThrower | FireBlast deriving Show
 data WaterMove = Bubble | WaterGun deriving Show
 data GrassMove = VineWhip deriving Show
 
-pickFireMove :: Fire -> FireMove
-pickFireMove Charmander = Ember
-pickFireMove Charmeleon = FlameThrower
-pickFireMove Charizard = FireBlast
+class (Show nature, Show move) => Pokemon nature  move where
+  pickMove :: nature -> move
 
-pickWaterMove :: Water -> WaterMove
-pickWaterMove Squirtle = Bubble
-pickWaterMove _ = WaterGun
+instance Pokemon Fire FireMove where
+  pickMove Charmander = Ember
+  pickMove Charmeleon = FlameThrower
+  pickMove Charizard = FireBlast
 
-pickGrassMove :: Grass -> GrassMove
-pickGrassMove _ = VineWhip
+instance Pokemon Water WaterMove where
+  pickMove Squirtle = Bubble
+  pickMove _ = WaterGun
+
+instance Pokemon Grass GrassMove where
+  pickMove _ = VineWhip
 
 printBattle :: String -> String -> String -> String -> String -> IO ()
 printBattle pk1 mv1 pk2 mv2 winner = do
@@ -31,8 +36,8 @@ battleWaterVsFire :: Water -> Fire -> IO ()
 battleWaterVsFire water fire = do
   printBattle (show water) (show wmove) (show fire) (show fmove) (show water)
   where
-    wmove = pickWaterMove water
-    fmove = pickFireMove fire
+    wmove = pickMove water :: WaterMove
+    fmove = pickMove fire :: FireMove
 
 battleFireVsWater = flip battleWaterVsFire
 
@@ -40,8 +45,8 @@ battleGrassVsWater :: Grass -> Water -> IO ()
 battleGrassVsWater grass water = do
   printBattle (show grass) (show gmove) (show water) (show wmove) (show grass)
   where
-    gmove = pickGrassMove grass
-    wmove = pickWaterMove water
+    gmove = pickMove grass :: GrassMove
+    wmove = pickMove water :: WaterMove
 
 battleWaterVsGrass = flip battleGrassVsWater
 
@@ -49,8 +54,8 @@ battleFireVsGrass :: Fire -> Grass -> IO ()
 battleFireVsGrass fire grass = do
   printBattle (show fire) (show fmove) (show grass) (show gmove) (show fire)
   where
-    fmove = pickFireMove fire
-    gmove = pickGrassMove grass
+    fmove = pickMove fire :: FireMove
+    gmove = pickMove grass :: GrassMove
 
 battleGrassVsFire = flip battleFireVsGrass
 
