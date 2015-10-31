@@ -35,15 +35,6 @@ pickMoveEx = do
   print $ pickMove Charmander
   print $ pickMove Ivysaur
 
-class (Pokemon winner, Pokemon loser) => Battle winner loser where
-  battle :: winner -> loser -> IO ()
-  battle w l = do
-      printBattle (show w) (show wmove) (show l) (show lmove) (show w)
-    where
-      wmove = pickMove w
-      lmove = pickMove l
-
-
 printBattle :: String -> String -> String -> String -> String -> IO ()
 printBattle pk1 mv1 pk2 mv2 winner = do
   putStrLn $ pk1 ++ " used " ++ mv1
@@ -51,18 +42,39 @@ printBattle pk1 mv1 pk2 mv2 winner = do
   putStrLn $ "Winner is: " ++ winner
   putStrLn ""
 
+class (Show (Winner left right), Pokemon left, Pokemon right) =>
+      Battle left right where
+  type Winner left right :: *
+  type Winner left right = left
+  battle :: left -> right -> IO ()
+  battle l r = do
+      printBattle (show l) (show lmove) (show r) (show rmove) (show winner)
+    where
+      lmove = pickMove l
+      rmove = pickMove r
+      winner = pickWinner l r
+  pickWinner :: left -> right -> (Winner left right)
 
-instance Battle Water Fire
+instance Battle Water Fire where
+  pickWinner left _ = left
+
 instance Battle Fire Water where
-  battle = flip battle
+  type Winner Fire Water = Water
+  pickWinner = flip pickWinner
 
-instance Battle Grass Water
+instance Battle Grass Water where
+  pickWinner left _ = left
+
 instance Battle Water Grass where
-  battle = flip battle
+  type Winner Water Grass = Grass
+  pickWinner = flip pickWinner
 
-instance Battle Fire Grass
+instance Battle Fire Grass where
+  pickWinner left _ = left
+
 instance Battle Grass Fire where
-  battle = flip battle
+  type Winner Grass Fire = Fire
+  pickWinner = flip pickWinner
 
 
 battleEx1 :: IO ()
