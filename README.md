@@ -8,4 +8,6 @@ Haskell Mini Experiments
 * continuations: Continuation.hs
 * text builder: StringThing.hs
 * type families: TypeFamily.hs
+* applicative style: ApplicativeStyle.hs
+
 
