@@ -20,6 +20,7 @@ library
                      , Continuation
                      , Conduit
                      , TypeFamily
+                     , ApplicativeStyle
   build-depends:       base >= 4.7 && < 5
                      , stm
                      , random
