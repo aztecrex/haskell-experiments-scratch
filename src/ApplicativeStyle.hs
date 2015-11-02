@@ -23,5 +23,10 @@ applEx6 = f2 <$> Nothing <*> Just 7
 applEx7 = f2 <$> Just 'a' <*> Nothing
 applEx8 = f2 <$> (Just 'a' <* Just 'b') <*> Just 7
 applEx9 = f2 <$> (Just 'a' *> Just 'b') <*> Just 7
+
 applEx10 = f2 <$> (Nothing *> Just 'b') <*> Just 7
 -- Nothing
+applEx11 = f2 <$> (Nothing <|> Just 'b') <*> Just 7
+-- Just "b-7"
+applEx12 = f2 <$> (Just 'a' <|> Nothing) <*> Just 7
+-- Just "a-7"
